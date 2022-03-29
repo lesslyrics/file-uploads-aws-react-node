@@ -9,10 +9,17 @@ const router = express.Router();
 /**
  * PROFILE IMAGE STORING STARTS
  */
+
+
+// Initialize the Amazon Cognito credentials provider
+aws.config.region = "us-east-1"; // Region
+aws.config.credentials = new aws.CognitoIdentityCredentials({
+	IdentityPoolId: "us-east-1:a593a65b-0778-41b9-8cf0-b84370dfcd8e"
+});
+
+
 const s3 = new aws.S3({
-	accessKeyId: 'xxx',
-	secretAccessKey: 'xxx',
-	Bucket: 'yourbucketname'
+	Bucket: 'testbucket-1h'
 });
 
 /**
@@ -21,38 +28,28 @@ const s3 = new aws.S3({
 const profileImgUpload = multer({
 	storage: multerS3({
 		s3: s3,
-		bucket: 'youbucketname',
+		bucket: 'testbucket-1h',
 		acl: 'public-read',
 		key: function (req, file, cb) {
-			cb(null, path.basename( file.originalname, path.extname( file.originalname ) ) + '-' + Date.now() + path.extname( file.originalname ) )
+			cb(null, path.basename( "test.mp4", path.extname( file.originalname ) )  + path.extname( 'test.mp4' ) )
 		}
 	}),
 	limits:{ fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
-	fileFilter: function( req, file, cb ){
-		checkFileType( file, cb );
-	}
+	// fileFilter: function( req, file, cb ){
+	// 	checkFileType( file, cb );
+	// }
 }).single('profileImage');
 
-/**
- * Check File Type
- * @param file
- * @param cb
- * @return {*}
- */
-function checkFileType( file, cb ){
-	// Allowed ext
-	const filetypes = /jpeg|jpg|png|gif/;
-	// Check ext
-	const extname = filetypes.test( path.extname( file.originalname ).toLowerCase());
-	// Check mime
-	const mimetype = filetypes.test( file.mimetype );
-	if( mimetype && extname ){
-		return cb( null, true );
-	} else {
-		cb( 'Error: Images Only!' );
-	}
-}
 
+
+/**
+ * @route POST /api/profile/notify
+ * @desc Notify about CNN results
+ * @access public
+ */
+router.post( '/notify', ( req, res ) => {
+	console.log('hello')
+})
 /**
  * @route POST /api/profile/business-img-upload
  * @desc Upload post image
@@ -72,7 +69,7 @@ router.post( '/profile-img-upload', ( req, res ) => {
 				res.json( 'Error: No File Selected' );
 			} else {
 				// If Success
-				const imageName = req.file.key;
+				const imageName = 'test.mp4';
 				const imageLocation = req.file.location;
 // Save the file name into database into profile model
 				res.json( {
@@ -92,16 +89,16 @@ router.post( '/profile-img-upload', ( req, res ) => {
 const uploadsBusinessGallery = multer({
 	storage: multerS3({
 		s3: s3,
-		bucket: 'orionnewbucket',
+		bucket: 'testbucket-1h',
 		acl: 'public-read',
 		key: function (req, file, cb) {
 			cb( null, path.basename( file.originalname, path.extname( file.originalname ) ) + '-' + Date.now() + path.extname( file.originalname ) )
 		}
 	}),
 	limits:{ fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
-	fileFilter: function( req, file, cb ){
-		checkFileType( file, cb );
-	}
+	// fileFilter: function( req, file, cb ){
+	// 	checkFileType( file, cb );
+	// }
 }).array( 'galleryImage', 4 );
 /**
  * @route POST /api/profile/multiple-file-upload
