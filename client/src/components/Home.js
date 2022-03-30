@@ -109,6 +109,37 @@ class Home extends Component {
 		}
 	};
 
+	resultObtainedHandler = ( event ) => {
+		const data = new FormData();
+// If file selected
+			axios.get( '/api/profile/result', data, {
+				headers: {
+					'accept': 'application/json',
+					'Accept-Language': 'en-US,en;q=0.8',
+				}
+			})
+				.then( ( response ) => {
+					if ( 200 === response.status ) {
+						// If file size is larger than expected.
+						if( response.data.error ) {
+							console.log('error')
+						} else {
+							// Success
+							let res = response.data;
+							console.log( ' result data', res );
+							// this.setState(res.result)
+							this.ocShowResult( res.result, 'rgba(48,137,207,0.01)' );
+						}
+					} else {
+						console.log("Error here: " + response.data + response.status)
+					}
+				}).catch( ( error ) => {
+				// If another error
+				this.ocShowAlert( error, 'red' );
+			});
+
+	};
+
 	// ShowAlert Function
 	ocShowAlert = ( message, background = '#3089cf' ) => {
 		let alertContainer = document.querySelector( '#oc-alert-container' ),
@@ -122,6 +153,21 @@ class Home extends Component {
 			$( alertEl ).fadeOut( 'slow' );
 			$( alertEl ).remove();
 		}, 3000 );
+	};
+
+	// ShowAlert Function
+	ocShowResult = ( message, background = 'rgba(0,145,255,0.02)' ) => {
+		let alertContainer = document.querySelector( '#test' ),
+			alertEl = document.createElement( 'div' ),
+			textNode = document.createTextNode( message );
+		alertEl.setAttribute( 'class', 'test' );
+		// $( alertEl ).css( 'background', background );
+		alertContainer.append( textNode );
+		// alertContainer.appendChild( alertEl );
+		setTimeout( function () {
+			$( alertEl ).fadeOut( 'slow' );
+			$( alertEl ).remove();
+		}, 12000 );
 	};
 
 	render() {
@@ -142,6 +188,12 @@ class Home extends Component {
 						<div className="mt-5">
 							<button className="btn btn-info" onClick={this.singleFileUploadHandler}>Upload!</button>
 						</div>
+						<div className="mt-5">
+							<button className="btn btn-info" onClick={this.resultObtainedHandler}>Get Result</button>
+						</div>
+						{/*<div><p>pppp</p></div>*/}
+						<div  style={{ color: '#555', background: '#ffffff' }} ><h3 id="test"></h3></div>
+
 					</div>
 				</div>
 			</div>

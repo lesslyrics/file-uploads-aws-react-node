@@ -17,7 +17,6 @@ aws.config.credentials = new aws.CognitoIdentityCredentials({
 	IdentityPoolId: "us-east-1:a593a65b-0778-41b9-8cf0-b84370dfcd8e"
 });
 
-
 const s3 = new aws.S3({
 	Bucket: 'testbucket-1h'
 });
@@ -40,7 +39,7 @@ const profileImgUpload = multer({
 	// }
 }).single('profileImage');
 
-
+var tmp = ""
 
 /**
  * @route POST /api/profile/notify
@@ -48,7 +47,15 @@ const profileImgUpload = multer({
  * @access public
  */
 router.post( '/notify', ( req, res ) => {
-	console.log('hello')
+	tmp = req.body.name
+	console.log('filename is ',tmp);
+	res.send(req.body);
+
+})
+
+router.get( '/result', ( req, res ) => {
+	console.log('get req')
+	res.json({ result: tmp });
 })
 /**
  * @route POST /api/profile/business-img-upload
