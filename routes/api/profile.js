@@ -3,6 +3,7 @@ const aws = require( 'aws-sdk' );
 const multerS3 = require( 'multer-s3' );
 const multer = require('multer');
 const path = require( 'path' );
+const childfork = require("child_process");
 
 const router = express.Router();
 
@@ -53,6 +54,35 @@ router.post( '/notify', ( req, res ) => {
 
 })
 
+function exec(cmd, handler = function(error, stdout, stderr){console.log(stdout);if(error !== null){console.log(stderr)}})
+{
+	const childfork = require('child_process');
+	return childfork.exec(cmd, handler);
+}
+
+
+/**
+ * @route GET /api/profile/execdocker
+ * @access public
+ */
+router.get( '/execfeatures', ( req, res ) => {
+	exec('docker run test:0.9');
+	res.json({ result: 'ready' });
+})
+
+
+/**
+ * @route POST /api/profile/notify
+ * @access public
+ */
+router.get( '/execnet', ( req, res ) => {
+	exec('curl https://testbucket-1h.s3.amazonaws.com/features.npy --output features.npy');
+	exec('curl -X POST -F file=features.npy http://localhost:3000/classify');
+	exec('rm features.npy')
+	res.json({ result: 'ready' });
+})
+
+
 router.get( '/result', ( req, res ) => {
 	console.log('get req')
 	res.json({ result: tmp });
@@ -76,6 +106,7 @@ router.post( '/profile-img-upload', ( req, res ) => {
 				res.json( 'Error: No File Selected' );
 			} else {
 				// If Success
+				tmp = ""
 				const imageName = 'test.mp4';
 				const imageLocation = req.file.location;
 // Save the file name into database into profile model

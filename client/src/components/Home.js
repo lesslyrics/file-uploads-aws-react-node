@@ -49,9 +49,13 @@ class Home extends Component {
 							}
 						} else {
 							// Success
+
 							let fileName = response.data;
 							console.log( 'filedata', fileName );
 							this.ocShowAlert( 'File Uploaded', '#3089cf' );
+
+							axios.get( '/api/profile/execfeatures')
+							// axios.get('api/profile/execnet')
 						}
 					}
 				}).catch( ( error ) => {
